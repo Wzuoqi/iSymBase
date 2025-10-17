@@ -1,0 +1,170 @@
+# Amplicon Data Processing Workflow
+
+## Overview
+
+This workflow consists of the following steps:
+
+1. **Quality Control and Merging**: Using Fastp to perform quality control and paired-end merging of raw sequencing data.
+
+2. **Primer Sequence Trimming**: Using Seqtk to uniformly trim primer sequences from both ends of the reads.
+
+3. **OTU Clustering and Taxonomic Annotation (Vsearch)**: Using Vsearch to perform OTU (Operational Taxonomic Unit) clustering, chimera removal, and preliminary taxonomic annotation.
+
+4. **Taxonomic Annotation (Qiime2)**: Using Qiime2 to perform more precise taxonomic annotation of OTU representative sequences.
+
+5. **Functional Annotation (FAPROTAX)**: Using FAPROTAX to predict potential functions based on taxonomic annotation results.
+
+---
+
+## Required Software and Environment Setup
+
+Before starting, please ensure you have installed the following software and added them to your system environment variables:
+
+- **Fastp**: A tool for FASTQ file preprocessing, including quality control, adapter removal, etc.
+
+- **Seqtk**: A toolkit for processing FASTA/Q format sequences.
+
+- **Vsearch**: A versatile microbiome analysis tool commonly used for sequence clustering, deduplication, etc.
+
+- **Qiime2**: A powerful microbiome analysis platform providing various functions from data processing to statistical analysis.
+
+- **FAPROTAX**: A literature-based tool for inferring functions based on prokaryotic taxonomic information.
+
+- **Greengenes v13.5 reference database**: Reference database used by Vsearch for taxonomic annotation.
+
+- **Pre-trained Greengenes classifier**: Used by Qiime2 for taxonomic annotation.
+
+## Detailed Procedure
+
+### 1. Quality Control and Merging (Fastp)
+
+This step aims to filter out low-quality reads and merge paired-end sequencing data to improve the accuracy of subsequent analyses.
+
+**a. Quality Control**
+
+Perform quality control on raw paired-end SRA data (input_file1 and input_file2).
+
+```shell
+# -i, -I: Input files 1 and 2
+# --q: Quality value filtering threshold; bases with quality below 15 will be trimmed
+# -u: Percentage threshold for trimming each read
+# -l: Length filtering threshold; reads shorter than 15 bp after trimming will be discarded
+# -o, -O: Output files 1 and 2
+# --detect_adapter_for_pe: Automatically detect and remove adapters for paired-end sequencing
+
+fastp -i input_file1 -I input_file2 --q 15 -u 40 -l 15 -o output_file1 -O output_file2 --detect_adapter_for_pe
+```
+
+**b. Paired-End Merging**
+
+Merge quality-controlled paired-end sequences (output_file1 and output_file2).
+
+```shell
+# -m, --merge: Enable merge mode
+# --merged_out: Output filename for merged sequences
+
+fastp -i output_file1 -I output_file2 -m --merged_out merged_file
+```
+
+### 2. Primer Sequence Trimming (Seqtk)
+
+To eliminate the influence of primer sequences on subsequent clustering and classification, we need to uniformly trim primer sequences from both ends of the reads.
+
+```shell
+# trimfq: Seqtk subcommand for sequence trimming
+seqtk trimfq -b 20 -e 20 input_file > output_file
+```
+
+### 3. OTU Table Generation and Annotation (Vsearch)
+
+In this step, we use Vsearch to cluster sequences, generate OTUs, and perform taxonomic annotation based on the Greengenes database.
+
+**a. Low-Frequency Sequence Removal (Dereplication)**
+
+Merge identical sequences and remove sequences with low occurrence frequency (minuniquesize 3 means at least 3 occurrences).
+
+```shell
+vsearch --fastx_uniques "$input_file" --minuniquesize 3 --threads 8 --sizeout --fastaout "$output_folder/${base_name}.na.fasta"
+```
+
+**b. Sequence Clustering**
+
+Cluster deduplicated sequences at 97% similarity to generate OTU representative sequences.
+
+```shell
+vsearch --cluster_fast "$output_folder/${base_name}.na.fasta" --id 0.97 --centroid "$output_folder/${base_name}.otu.fa" --relabel "${base_name}_" --sizeout --threads 8
+```
+
+**c. Chimera Removal**
+
+Identify and remove chimeric sequences that may have been generated during PCR amplification.
+
+```shell
+vsearch --uchime3_denovo "$output_folder/${base_name}.otu.fa" --threads 8 --nonchimeras "$output_folder/${base_name}.otuna.fa"
+```
+
+**d. OTU Table Generation**
+
+Map the original processed sequences back to OTU representative sequences to generate an OTU abundance table.
+
+```shell
+vsearch --usearch_global "$input_file" --db "$output_folder/${base_name}.otuna.fa" --id 0.97 --threads 8 --otutabout "$output_folder/${base_name}.otutab.txt"
+```
+
+**e. Taxonomic Classification (SINTAX)**
+
+Use the SINTAX algorithm and Greengenes database to perform taxonomic annotation of OTU representative sequences.
+
+```shell
+vsearch --sintax "$output_folder/${base_name}.otuna.fa" --db "$sintax_db" --sintax_cutoff 0.1 --threads 8 --tabbedout "$output_folder/${base_name}.sintax"
+```
+
+### 4. Taxonomic Annotation with Qiime2
+
+To obtain more reliable taxonomic annotation results, we use the Qiime2 platform and its pre-trained classifier to classify OTU representative sequences generated by Vsearch.
+
+**a. Import OTU Representative Sequences**
+
+Import FASTA format OTU sequence files into Qiime2 standard format (.qza).
+
+```shell
+qiime tools import \
+  --type 'FeatureData[Sequence]' \
+  --input-path "${base_name}.otuna.fa" \
+  --output-path "${base_name}.repotu.qza"
+```
+
+**b. Taxonomic Annotation**
+
+Use the pre-trained Greengenes classifier to perform taxonomic classification of imported sequences.
+
+```shell
+# --i-classifier: Specify the pre-trained classifier file
+# --i-reads: Input OTU representative sequence file
+# --o-classification: Output taxonomic annotation result
+
+qiime feature-classifier classify-sklearn \
+  --i-classifier "gg_2022_10_backbone_full_length.nb.qza" \
+  --i-reads "${base_name}.repotu.qza" \
+  --o-classification "${base_name}.taxonomy.qza"
+```
+
+**c. Export Taxonomic Annotation Results**
+
+Export Qiime2 format annotation results to tab-separated text files (.tsv) for subsequent analysis.
+
+```shell
+qiime tools export \
+  --input-path "${base_name}.taxonomy.qza" \
+  --output-path "taxonomy_folder"
+```
+
+Note: The exported taxonomy.tsv file is in the specified taxonomy_folder directory.
+
+### 5. Functional Annotation (FAPROTAX)
+
+Finally, we use the FAPROTAX tool to predict potential functions of the microbial community based on taxonomic annotation information provided by Qiime2.
+
+```shell
+python collapse_table.py -i "taxonomy_folder/taxonomy.tsv" -o "${base_name}.faprotax" -g "FAPROTAX.txt" -r "${base_name}.report.txt" -v -d 'Taxon'
+```
