@@ -1,0 +1,136 @@
+﻿How can I find all symbionts associated with honeybees?,You can find honeybee symbionts by: 1. Going to the 'Browse' section on the top navigation 2. Selecting 'Host Species' 3. Searching for 'Apis mellifera' 4. Viewing the associated symbiont records
+How do I use the batch search tool?,"The batch search tool allows you to:
+Upload taxonomic composition data (Kraken, MetaPhlAn, or Krona formats)
+Select your file format from the dropdown menu
+Specify host information (insect order and species name)
+Get potential symbiont matches with scoring
+After clicking ""Search Symbionts,"" you'll see a table of results showing potential symbionts, their functions, abundance percentages, and match scores. You can download the complete results for further analysis."
+What principles does the Batch Search Tool use to find potential symbionts?,"The Batch Search Tool identifies potential symbionts by:
+Comparing your taxonomic data against our insect symbiont database
+Scoring matches based on multiple factors:
+Abundance percentage in your sample
+Taxonomic match level (species matches score higher than genus-only matches)
+Host insect match (same order +10 points, same species +20 points)
+Richness of functional description (more detailed descriptions score higher)
+The system then ranks potential symbionts by total score, helping you identify the most likely symbiotic relationships in your data."
+What file formats does the Batch Search Tool accept?,"The Batch Search Tool accepts three file formats:
+Kraken2 reports (tab-separated with percentage and taxonomic info)
+MetaPhlAn output (taxonomy strings with abundance values)
+Krona input format (tab-separated with counts and full taxonomy path)
+You can either upload your file directly or paste the content into the text area."
+How are the search results scored and ranked?,"Results are scored based on:
+Base score = abundance percentage in your sample
+Species-level match: +5 points
+Host order match: +10 points
+Host species match: +20 points
+Function description: up to +5 points (based on detail level)
+Higher scores indicate more likely symbiotic relationships. Results are ranked by total score, with a maximum of 3 entries per symbiont."
+Can I filter or search within my batch search results?,"Yes, you can:
+Use the search box above the results table to filter by any text
+Sort results by clicking on column headers
+View detailed information by clicking on symbiont IDs
+Download complete results as a text file for further analysis
+This makes it easy to focus on specific symbionts or patterns in your data."
+Where do the functional descriptions and classifications in the symbiont records in the database come from?,"All symbiont records in our database come exclusively from peer-reviewed scientific literature. The functional descriptions are taken directly from the original publications, ensuring accuracy and fidelity to the source. Additionally, our classification criteria are based on a comprehensive review of all collected functional records combined with insights from relevant past reviews."
+How do I navigate the network visualization?,"The network visualization offers several interactive features:
+Node interactions:
+Click on nodes to view detailed information pages
+Orange nodes represent insect hosts (species level)
+Blue nodes represent symbionts (genus level)
+Drag nodes to rearrange the network layout
+Search functionality:
+Use the search box to find specific nodes
+Matching nodes will be highlighted with a golden glow
+Click ""Reset"" to return to the full network view
+Mouse controls:
+Hover over nodes to see connection counts
+Click and drag to move the entire network
+Scroll to zoom in and out"
+What do the different node colors represent in the network?,"In the network visualization:
+1. Orange circular nodes represent insect hosts (species level)
+Blue circular nodes represent symbiont genera
+3. Special colored nodes highlight vital symbiont genera with particular importance
+4. Golden glow appears around nodes that match your search terms
+The size of each node indicates its connectivity - larger nodes have more connections to other species in the network."
+How can I find specific relationships in the network?,"To find specific relationships:
+1.Use the search box to locate specific hosts or symbionts
+Type a name and press Enter or click ""Search""
+Matching nodes will be highlighted and their connections preserved
+2.Click on connections (edges) between nodes to:
+View the specific symbiotic relationship details
+Open a filtered search page showing all records of that relationship
+3.Click on nodes to access detailed information pages about:
+Host species (orange nodes)
+Symbiont genera (blue nodes)"
+How is the gene catalog constructed?,"The gene catalog was built from predicted genes in the genomes using the following steps:
+
+Gene Prediction:
+
+Prodigal was used to predict genes:
+Metagenomic contigs processed in metagenomic mode (-p meta).
+Single genomes processed in single-genome mode (-p single).
+Nonredundant Gene Clustering:
+
+CD-HIT was used to remove redundant genes, grouping sequences with:
+≥90% identity
+≥90% coverage
+This resulted in a nonredundant gene catalog for each host species.
+Functional Annotation:
+
+DIAMOND aligned genes to the NR (non-redundant protein) database to determine functions.
+eggNOG-mapper assigned:
+COG functional categories
+KEGG pathways using eggNOG DB 5.0.2."
+How is the genome catalog constructed?,"The genome catalog consists of 3,520 newly recovered MAGs (Metagenome-Assembled Genomes) and 2,078 published insect symbiont genomes from sources like NCBI, NGDC, and BV-BRC. These genomes were processed as follows:
+
+Quality Assessment:
+
+Each genome was evaluated using CheckM.
+The MIMAG standard was applied, with genomes removed if they had:
+Completeness <50%
+Contamination >10%
+Quality score (QS) <50 (QS = completeness - 5 × contamination).
+Taxonomic Annotation:
+
+GTDB-Tk was used for classification under default parameters (dataset r220).
+Additional taxonomic and functional information from literature was incorporated."
+Q: Which symbiont in the Colorado potato beetle (Leptinotarsa decemlineata) produces hydrogen cyanide for defense," A: Proteus vulgaris Ld01 generates toxic hydrogen cyanide, offering the beetle protection from predators;"
+Q: How does Serratia harmoniae benefit the harlequin ladybird (Harmonia axyridis), A: It confers an intraguild predation advantage by causing severe mortality in other ladybird species;
+Q: What effect does Klebsiella spp. have on the fall armyworm (Spodoptera frugiperda), A: Klebsiella spp. may enhance the insect’s fecundity;
+Q: Which symbiont aids Sitobion miscanthi in inhibiting a new densovirus infection (SmDV), A: The Sitobion miscanthi L-type symbiont (SMLS) mediates host antiviral defenses against SmDV;
+Q: How do Cardinium and Wolbachia affect the microbial community in Sogatella furcifera, A: Both symbionts significantly reduce the overall diversity of the pest’s microbiota;
+Q: What role does the gut microbiome play in Tuta absoluta," A: Although the genus and function are undetermined, the invasive pest harbors a bacterial biota referenced simply as its microbiome;"
+Q: Which bacterial strains in Scirpophaga incertulas can degrade insecticides in vitro," A: Various Bacillus strains, including Bacillus cereus strain NRYSBBC-1, effectively degrade chlorpyrifos and chlorantraniliprole;"
+Q: How do black blow fly (Phormia regina) symbionts influence stable fly oviposition," A: Certain strains (e.g., Exiguobacterium sp., Serratia marcescens) prompt oviposition, while Morganella morganii can deter it;"
+Q: Why is Asaia considered a promising symbiont in Aedes aegypti mosquitoes," A: Asaia can inhibit CHIKV replication, making it a potential tool for arboviral control;"
+Q: What is the potential impact of Gluconobacter on Aedes aegypti infection rates, A: Gluconobacter may increase the mosquito’s susceptibility to Chikungunya virus infection.;
+Q: Which bacterial component in Bombyx mori’s metagenome can inhibit fungal spore germination, A: A secreted chitinolytic lysozyme (Msp1) damages fungal cell walls and prevents Metarhizium robertsii and Beauveria bassiana from germinating;
+Q: What role does the fungus Amylostereum chailletii play in siricid wood wasps like Sirex juvencus," A: It is an extracellular symbiont associated with wood wasps, though no specific function beyond this partnership is highlighted;"
+"Q: In Osmia cornifrons, why might Delftia be beneficial for the bee’s immune defense", A: Delftia exhibits antibiotic activity and could protect the mason bee from pathogens during horizontal transmission;
+Q: Which endosymbiont supplies B-vitamin cofactors in the blood-sucking bat fly Penicillidia jenynsii," A: “Candidatus Aschnera chinzeii” provides vital cofactors including biotin, folate, riboflavin, and pyridoxal 5'-phosphate;"
+Q: How does Pseudomonas fulva ZJU1 assist Bombyx mori in tolerating mulberry-derived DNJ," A: It can degrade 1-deoxynojirimycin as an energy source, boosting the host’s resistance and growth;"
+Q: Which bacterium in Nilaparvata lugens helps defend against nicotine-induced stress," A: Burkholderia cepacia BsNLG8, in conjunction with the Defensin A gene, enhances the planthopper’s resistance to nicotine;"
+"Q: In Blattella germanica, why is the gut microbiome considered nonessential but still helpful"," A: While the cockroach can survive without it, gut bacteria aid in nutrient absorption and may influence uric acid storage;"
+Q: What function do Enterococcus faecalis and Serratia marcescens perform in Bactrocera minax larvae," A: Both degrade phenolic compounds in unripe citrus, enabling the larvae to better tolerate plant secondary metabolites;"
+Q: Which bacterium in Osmia cornifrons might aid pesticide metabolism and gut resiliency, A: Microbacterium may help maintain microbiome balance and detoxify harmful substances in larvae;
+Q: How does Gilliamella apicola potentially affect learning in honeybees (Apis mellifera)," A: By synthesizing endocannabinoid compounds from pollen-derived fatty acids, it modulates reward learning and memory."
+Q: How might Pantoea sp. Nvir benefit the southern green stink bug (Nezara viridula),"; A: It can mediate interactions between the insect and host plants, potentially repressing plant defenses and facilitating sustainable pest control strategies."
+Q: What role does Serratia marcescens play in the nutrition of Nezara viridula,"; A: By degrading toxic plant metabolites and repressing plant chemical defenses, Serratia marcescens aids the shield bug’s feeding and overall nutrition."
+Q: Why is the symbiotic fungus Leptographium procerum of concern in Dendroctonus valens,"; A: In a warming climate, this fungus can exacerbate pest-pathogen threats, posing challenges for red turpentine beetle management."
+Q: What is notable about Harpella melusinae in Prosimulium fungiforme,"; A: It is a vertically transmitted fungal symbiont found in black flies, although its specific function remains unclear."
+Q: How do Citrobacter freundii and Escherichia coli influence mating signals in Tribolium castaneum,"; A: Both bacteria may produce 4,8-dimethyldecanal (DMD), a pheromone component linked to female attraction and mate communication."
+Q: Which gut bacteria can benefit sterile Ceratitis capitata under probiotic treatments,"; A: Enterobacter, Klebsiella oxytoca, and Lactococcus lactis help improve gut enzyme function and overall gut microbiota composition."
+Q: How does Rickettsia affect Bemisia tabaci MED populations,"; A: By boosting juvenile hormone synthesis, it increases fecundity and skews the sex ratio toward more female offspring, facilitating its own transmission."
+"Q: In Tenebrio molitor, why is Stenotrophomonas maltophilia of scientific interest","; A: This bacterium has been linked to the degradation of polyvinyl chloride (PVC), suggesting a possible role in plastic breakdown."
+Q: What function does Acinetobacter serve in Nilaparvata lugens (brown planthopper),"; A: It helps degrade cellulose and toxic compounds, thereby enhancing the insect’s detoxification and adaptability in harsh environments."
+Q: Why might Bradyrhizobium be beneficial in the gut of Coccinella septempunctata,"; A: It is known for nitrogen-fixing abilities and may bolster plant defense gene expression, indirectly benefiting the ladybeetle through improved nutritional support."
+Q: How do Serratia sp. in cycad-feeding beetles (Rhopalotria slossonae and Pharaxonotha floridana) tolerate toxins like BMAA,"; A: They have an unprecedented desferrioxamine-like pathway that produces bacterial siderophores, aiding in detoxification of azoxyglycosides, BMAA, and other cycad toxins."
+"Q: In Aphis gossypii, which bacterial genera shift in response to parasitization by Binodoxys communis","; A: Pseudomonas, Rhodococcus, and Serratia all show changes in the ovarian microbiota following parasitization."
+Q: How do black soldier fly larvae (Hermetia illucens) exhibit optimized plastic-degrading ability,"; A: Their gut microbiome adapts to degrade plastic, selecting for biodegrading functions to break down materials like polyethylene."
+"Q: In Anopheles stephensi, what role does Serratia ureilytica Su_YN1 play","; A: It mediates mosquito resistance to Plasmodium, possibly by activating phenylalanine metabolism to enhance commensal colonization."
+Q: Which bacteria in Chilo suppressalis oral secretions can suppress the plant’s jasmonic acid defenses,"; A: Acinetobacter and Enterobacter both interfere with rice’s anti-herbivore defense, preventing full activation of JA-regulated pathways."
+Q: How does Candidatus Carsonella ruddii benefit Cacopsylla pyricola (pear psyllid),"; A: It synthesizes essential amino acids, while another symbiont, Psyllophila, complements the missing tryptophan pathway genes and provides vitamins."
+"Q: In Rhopalosiphum maidis, how does Hamiltonella defensa affect the aphid’s life history traits","; A: Infection shortens first-instar and total nymph stages but also reduces survival, fecundity, and overall longevity."
+Q: What is significant about Caballeronia jiangsuensis in Riptortus pedestris,"; A: This horizontally transmitted symbiont boosts host development, body size, and reproduction under laboratory conditions."
+Q: How do Serratia grimesii strains distribute between Anaphes nitens (parasitoid wasp) and Gonipterus platensis (weevil),"; A: They are shared vertically between the wasp and its weevil host, indicating a symbiotic relationship affecting both species."
+Q: Why might Buchnera aphidicola be relevant in Melanaphis sacchari,"; A: Though details are limited, Buchnera species commonly supply essential nutrients to aphids, influencing their survival and reproduction."
