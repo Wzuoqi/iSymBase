@@ -22,11 +22,11 @@
 iSymBase/
 ├── workflow/           # Bioinformatics analysis pipelines
 │   ├── Fastp Quality Control.md
-│   ├── MetaPhIAn Taxnomic Profiling.md
+│   ├── MetaPhIAn Taxonomic Profiling.md
 │   ├── Megahit Metagenome Assembly.md
 │   ├── Prodigal Gene Prediction.md
 │   ├── eggNOG-mapper Gene Annotation.md
-│   ├── Kraken Taxnomic Profiling.md
+│   ├── Kraken Taxonomic Profiling.md
 │   ├── Metabat2 Metagenome Binning.md
 │   └── Amplicon Data Process.md
 ├── scripts/           # Utility scripts and tools
@@ -34,13 +34,60 @@ iSymBase/
 │   └── metaphlan2krona.py
 ├── isymseek/         # AI-enhanced query system
 │   ├── RAGflow Workflow for iSymBase Enhancement.md
+│   ├── ragflow_config.json
+│   ├── query.py
 │   └── knowledgebase demo/
+├── database/         # Database schema and construction
+│   ├── README.md
+│   └── build_symbionts_db.py
 └── LICENSE           # MIT License
 ```
 
 ## 📋 Bioinformatics Workflows
 
-This repository provides comprehensive documentation for standard metagenomics analysis pipelines used in insect symbiont research:
+### Pipeline Overview
+
+The following diagram shows how the analysis workflows connect. Two parallel pipelines are provided: **metagenomics** (whole-genome shotgun sequencing) and **amplicon** (16S rRNA / ITS marker gene sequencing).
+
+```mermaid
+flowchart TD
+    RAW[Raw Sequencing Data<br/>FASTQ]
+
+    RAW --> QC[<b>Fastp</b><br/>Quality Control &amp; Trimming<br/>workflow/]
+
+    QC --> TAX_M[MetaPhlAn 4<br/>Species-level Profiling]
+    QC --> TAX_K[Kraken2 + Bracken<br/>k-mer Classification]
+    QC --> ASM[<b>MEGAHIT</b><br/>Metagenome Assembly]
+
+    ASM --> PROD[<b>Prodigal</b><br/>Gene Prediction]
+    ASM --> BIN[<b>MetaBAT2</b><br/>Genome Binning<br/>→ MAGs]
+
+    PROD --> CDHIT[CD-HIT<br/>Redundancy Removal]
+    CDHIT --> DMND[DIAMOND BLASTX<br/>vs Symbionts DB]
+    CDHIT --> EGG[<b>eggNOG-mapper</b><br/>Functional Annotation<br/>GO, KEGG, COG, Pfam]
+
+    BIN --> CHKM[CheckM<br/>Bin Quality Assessment]
+
+    subgraph AMP[<b>Amplicon Pipeline</b>]
+        QC2[Fastp<br/>QC &amp; Merge] --> SEQTK[Seqtk<br/>Primer Trimming]
+        SEQTK --> VSRCH[Vsearch<br/>OTU Clustering<br/>Chimera Removal]
+        VSRCH --> QIIME[Qiime2<br/>Taxonomic Annotation]
+        QIIME --> FAPRO[FAPROTAX<br/>Functional Prediction]
+    end
+
+    QC --> AMP
+
+    style QC fill:#e8f5e9
+    style ASM fill:#e8f5e9
+    style PROD fill:#e8f5e9
+    style BIN fill:#e8f5e9
+    style EGG fill:#e8f5e9
+    style AMP fill:#fff3e0
+```
+
+**Key**: Green = Metagenomics core workflow | Orange = Amplicon workflow
+
+*Input/output connections between sequential steps are indicated by arrows. Each workflow document in the `workflow/` directory provides detailed commands, parameter explanations, and example outputs.*
 
 ### Core Analysis Pipeline
 
@@ -49,10 +96,10 @@ This repository provides comprehensive documentation for standard metagenomics a
    - Adapter removal and filtering protocols
    - Batch processing guidelines
 
-2. **[Taxonomic Profiling](workflow/MetaPhIAn%20Taxnomic%20Profiling.md)**
+2. **[Taxonomic Profiling](workflow/MetaPhIAn%20Taxonomic%20Profiling.md)**
    - Species-level microbial community composition analysis
    - MetaPhlAn 4 implementation with 5.1M unique marker genes
-   - Alternative approach: [Kraken2 Taxonomic Profiling](workflow/Kraken%20Taxnomic%20Profiling.md)
+   - Alternative approach: [Kraken2 Taxonomic Profiling](workflow/Kraken%20Taxonomic%20Profiling.md)
 
 3. **[Metagenome Assembly](workflow/Megahit%20Metagenome%20Assembly.md)**
    - De novo assembly of metagenomic sequences
@@ -95,6 +142,10 @@ See the complete [RAGflow workflow documentation](isymseek/RAGflow%20Workflow%20
 - Query processing algorithms
 - Performance evaluation metrics
 
+Reference implementation files:
+- **[ragflow_config.json](isymseek/ragflow_config.json)**: Knowledge base configuration with chunk methods, embedding model, and retrieval parameters for all four knowledge bases.
+- **[query.py](isymseek/query.py)**: Python implementation of the RAG pipeline, demonstrating vector store retrieval and LLM query augmentation. Requires `openai`, `chromadb`, and `sentence-transformers` packages.
+
 ## 🛠️ Utility Scripts
 
 ### Available Tools
@@ -108,36 +159,21 @@ Refer to individual script documentation for detailed usage instructions and par
 
 ## 🔍 Transparency & Reproducibility
 
-### Addressing Reviewer Concerns
+This repository is designed to provide full methodological transparency for the iSymBase project. The following describes what is covered and the scope of documentation provided.
 
-In response to reviewer feedback regarding transparency and reliability, this repository provides:
+### What Is Documented
 
-#### 1. **Complete Source Code Access**
-- All bioinformatics pipelines with detailed parameter explanations
-- AI model integration code and RAGflow implementation
-- Database construction and maintenance protocols
+- **Bioinformatics workflows**: Each analysis step in `workflow/` includes software version references, complete command lines, parameter explanations, and example output files to enable independent replication.
+- **Database schema**: The `database/README.md` describes the structure, field definitions, and relationships of all four core data tables (Symbiont Records, Metagenomes, Amplicons, Insect Hosts).
+- **Custom database construction**: The `database/build_symbionts_db.py` script documents how the Symbionts reference protein database is filtered from NCBI NR by taxonomy.
+- **AI query system architecture**: The iSymSeek RAGflow workflow document describes the knowledge base design, embedding model selection, chunking strategy, and parameter choices used in the retrieval-augmented generation pipeline. A reference implementation is provided in `isymseek/query.py` and `isymseek/ragflow_config.json`.
+- **Utility scripts**: Python tools for sequence length filtering (`scripts/extract_seq.py`) and MetaPhlAn-to-Krona format conversion (`scripts/metaphlan2krona.py`).
 
-#### 2. **Algorithmic Transparency**
-- Step-by-step workflow documentation in `/workflow/` directory
-- Parameter justification and optimization guidelines
-- Performance benchmarking and validation results
+### Reproducibility Notes
 
-#### 3. **AI Model Documentation**
-- Complete RAGflow architecture documentation
-- Knowledge base construction methodology
-- Query processing algorithms with evaluation metrics
-
-#### 4. **Reproducibility Standards**
-- Standardized computational environments
-- Version-controlled dependencies and software requirements
-- Comprehensive testing and validation protocols
-
-### Quality Assurance Framework
-
-- **Documentation Standards**: Comprehensive protocols for each analysis step
-- **Version Control**: Git-based tracking of all methodological changes
-- **Community Review**: Open-source peer review process
-- **Continuous Integration**: Automated testing of workflow components
+- **Software versions**: Specific tool versions are noted in each workflow document where applicable. A unified Conda environment specification can be generated from the installation commands provided in each workflow.
+- **Reference databases**: Versions and download sources for all reference databases (MetaPhlAn markers, EggNOG 5.0, Kraken2 database, Greengenes v13.5) are indicated in the respective workflow documents.
+- **Example data**: All workflow examples use publicly available NCBI SRA run accessions, enabling direct reproduction with the same input data.
 
 ## 🔧 Installation & Setup
 
@@ -194,26 +230,20 @@ We welcome contributions from the research community. Please:
 - Provide example datasets and expected outputs where applicable
 - Update this README when adding new components
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 📞 Contact & Support
+## Contact & Support
 
 - **Repository Issues**: [GitHub Issues](https://github.com/midjuly/iSymBase/issues)
 - **Documentation Questions**: Refer to individual workflow files
 - **Technical Support**: Community-driven support through GitHub discussions
 
-## 📖 Citation
+## Citation
 
 If you use iSymBase workflows or methodologies in your research, please cite appropriately and reference the specific workflow documentation used.
 
-## 🙏 Acknowledgments
 
-- Bioinformatics software developers for the excellent tools integrated in these workflows
-- Research community contributors and beta testers
-- Funding agencies supporting insect symbiont research initiatives
-
----
 
 **Note**: This repository represents our commitment to open science and transparent research practices. All methodologies, algorithms, and data processing steps are fully documented and reproducible, directly addressing concerns about reliability and transparency in computational biology research.

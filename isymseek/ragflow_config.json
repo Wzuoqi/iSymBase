@@ -1,0 +1,62 @@
+{
+    "description": "RAGflow knowledge base configuration for iSymSeek - insect symbiont AI query system",
+    "api": {
+        "provider": "deepseek",
+        "model": "deepseek-chat",
+        "base_url": "https://api.deepseek.com/v1",
+        "api_key_env": "DEEPSEEK_API_KEY"
+    },
+    "embedding": {
+        "model": "BAAI/bge-base-en-v1.5",
+        "dimension": 768
+    },
+    "knowledge_bases": {
+        "literature": {
+            "description": "106 core publications on insect symbionts",
+            "source_path": "./knowledgebase demo/literature/",
+            "file_types": ["pdf"],
+            "chunk_method": "naive",
+            "chunk_token_number": 128,
+            "delimiter": "\n!?;.;！；？",
+            "auto_keyword": 0,
+            "auto_question": 0,
+            "paper_rank": 0
+        },
+        "table": {
+            "description": "2,665 symbiont-host relationship records",
+            "source_path": "./knowledgebase demo/Table Knowlege Base.xlsx",
+            "file_types": ["xlsx"],
+            "chunk_method": "table",
+            "chunk_token_number": 128,
+            "table_header_row": 1
+        },
+        "manual": {
+            "description": "Database usage guide and operational procedures",
+            "source_path": "./knowledgebase demo/Manual Knowlege Base.md",
+            "file_types": ["md"],
+            "chunk_method": "naive",
+            "chunk_token_number": 128,
+            "delimiter": "\n!?;.;！；？",
+            "auto_keyword": 0,
+            "auto_question": 0
+        },
+        "faq": {
+            "description": "36 common questions and answers",
+            "source_path": "./knowledgebase demo/FAQ Knowlege Base.csv",
+            "file_types": ["csv"],
+            "chunk_method": "qa",
+            "chunk_token_number": 128,
+            "qa_separator": ","
+        }
+    },
+    "retrieval": {
+        "top_k": 5,
+        "similarity_threshold": 0.7,
+        "rerank_enabled": false
+    },
+    "generation": {
+        "system_prompt": "You are an expert assistant for the iSymBase insect symbiont database. Answer user questions based on the provided context. If the context does not contain sufficient information, acknowledge the limitation and suggest alternative queries.",
+        "max_tokens": 1024,
+        "temperature": 0.3
+    }
+}

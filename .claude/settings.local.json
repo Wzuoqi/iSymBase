@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import ast; ast.parse\\(open\\('E:/wangzuoqi/project/240612-昆虫共生菌数据库/github/iSymBase/isymseek/query.py'\\).read\\(\\)\\); print\\('query.py: OK'\\)\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('E:/wangzuoqi/project/240612-昆虫共生菌数据库/github/iSymBase/database/build_symbionts_db.py'\\).read\\(\\)\\); print\\('build_symbionts_db.py: OK'\\)\")",
+      "Bash(git *)"
+    ]
+  }
+}
